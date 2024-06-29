@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Simple Time Tracker</title>
-</head>
-<link rel="stylesheet" href="css/bootstrap.min.css">
+<?php
 
-<body>
+/** @var yii\web\View $this */
+
+$this->title = 'My Yii Application';
+?>
 <div class="container mt-5">
     <h1 class="text-center">Time Tracker</h1>
     <div class="row justify-content-center">
@@ -35,7 +32,4 @@
     </div>
 </div>
 
-<script src="app.js"></script>
-</body>
-</html>
-
+<script src="/js/app.js"></script>
