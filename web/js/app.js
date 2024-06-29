@@ -1,4 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    fetch('/site/read-time-track-data', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    })
+        .then(response => response.json())
+        .then(data2 => {
+            console.log(data2);
+            let data = JSON.parse(data2);
+            console.log(data);
+            if ('lastUpdate' in data) {
+                let serverLastUpdate = new Date(data.lastUpdate);
+                let localLastUpdate = new Date(localStorage.getItem('lastUpdate'));
+
+                // Check if server's lastUpdate is newer than local's lastUpdate
+                if (serverLastUpdate > localLastUpdate) {
+                    // If so, update localStorage with server data
+                    Object.keys(data).forEach(key => {
+                        localStorage.setItem(key, data[key]);
+                    });
+
+                    // And reload the page
+                    console.log('updated')
+                    //location.reload();
+                }
+
+            }
+        })
+        .catch((error) => {
+            console.error('Fatal Error');
+            document.body.innerHTML = '';
+        });
+
     const taskInput = document.getElementById('taskInput');
     const categoryInput = document.getElementById('categoryInput');
     const toggleTimerBtn = document.getElementById('toggleTimerBtn');
@@ -100,3 +133,43 @@ document.addEventListener('DOMContentLoaded', () => {
     loadState();
     loadEntries();
 });
+
+document.getElementById("toggleTimerBtn").addEventListener("click", function() {
+    let storageObj = {};
+
+    // Iterate over each item in storage
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);
+        let value = localStorage.getItem(key);
+
+        storageObj[key] = value;
+    }
+
+    localStorage.setItem('lastUpdate', new Date().toISOString());
+
+    let jsonData = JSON.stringify(storageObj);
+
+    // Get CSRF token from meta tags
+    let csrfToken = getCSRFToken();
+
+    fetch('/site/save-time-track-data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken // Send CSRF token in the header
+        },
+        body: JSON.stringify({
+            time_track_data: jsonData
+        }),
+    })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+});
+
+// Function to get CSRF token from cookies
+function getCSRFToken() {
+    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+}
