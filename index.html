@@ -4,85 +4,38 @@
 <meta charset="UTF-8">
 <title>Simple Time Tracker</title>
 </head>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+
 <body>
-    <h1>Time Tracker</h1>
-    <input type="text" id="taskInput" placeholder="Enter task description">
-    <input type="text" id="categoryInput" placeholder="Enter task category">
-    <button id="toggleTimerBtn">Start Timer</button>
-    <div id="timerDisplay">00:00:00</div>
-    <ul id="entriesList"></ul>
+<div class="container mt-5">
+    <h1 class="text-center">Time Tracker</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form id="taskForm">
+                <div class="form-group">
+                    <label for="taskInput">Task Description</label>
+                    <input type="text" class="form-control" id="taskInput" placeholder="Enter task description">
+                </div>
+                <div class="form-group">
+                    <label for="categoryInput">Task Category</label>
+                    <input type="text" class="form-control" id="categoryInput" placeholder="Enter task category">
+                </div>
+                <button type="button" class="btn btn-primary btn-block" id="toggleTimerBtn">Start Timer</button>
+            </form>
+            <div class="text-center mt-3">
+                <div id="timerDisplay" class="h3">00:00:00</div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col">
+            <h2>Time Entries</h2>
+            <ul class="list-group" id="entriesList"></ul>
+        </div>
+    </div>
+</div>
 
-    <script >
-document.addEventListener('DOMContentLoaded', () => {
-    const taskInput = document.getElementById('taskInput');
-    const categoryInput = document.getElementById('categoryInput');
-    const toggleTimerBtn = document.getElementById('toggleTimerBtn');
-    const timerDisplay = document.getElementById('timerDisplay');
-    const entriesList = document.getElementById('entriesList');
-    let timer = null;
-    let seconds = 0;
-    let startTime = null;
-    let running = false;
-
-    // Load existing entries from local storage
-    const loadEntries = () => {
-        const entries = JSON.parse(localStorage.getItem('timeEntries')) || [];
-        // Reverse the array to display the most recent entry first
-        entriesList.innerHTML = entries.reverse().map(entry =>
-            `<li>${entry.description} - ${entry.category} - Duration: ${entry.duration} - Start: ${entry.startTime} - End: ${entry.endTime}</li>`
-        ).join('');
-    }
-
-    // Update timer display
-    const updateDisplay = () => {
-        const hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
-        const mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-        const secs = (seconds % 60).toString().padStart(2, '0');
-        timerDisplay.textContent = `${hrs}:${mins}:${secs}`;
-    }
-
-    // Start or stop the timer
-    toggleTimerBtn.addEventListener('click', () => {
-        if (!running) {
-            running = true;
-            toggleTimerBtn.textContent = 'Stop Timer';
-            startTime = new Date().toLocaleTimeString();
-            timer = setInterval(() => {
-                seconds++;
-                updateDisplay();
-            }, 1000);
-        } else {
-            running = false;
-            toggleTimerBtn.textContent = 'Start Timer';
-            clearInterval(timer);
-            const endTime = new Date().toLocaleTimeString();
-
-            // Save the entry to local storage
-            const entries = JSON.parse(localStorage.getItem('timeEntries')) || [];
-            entries.push({
-                description: taskInput.value,
-                category: categoryInput.value,
-                duration: timerDisplay.textContent,
-                startTime: startTime,
-                endTime: endTime
-            });
-            localStorage.setItem('timeEntries', JSON.stringify(entries));
-            loadEntries();
-
-            // Reset inputs and timer
-            taskInput.value = '';
-            categoryInput.value = '';
-            seconds = 0;
-            updateDisplay();
-        }
-    });
-
-    // Initially load entries
-    loadEntries();
-});
-
-
-    </script>
+<script src="app.js"></script>
 </body>
 </html>
 
